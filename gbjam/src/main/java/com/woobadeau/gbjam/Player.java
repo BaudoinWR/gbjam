@@ -166,7 +166,8 @@ public class Player extends Thing implements Collider {
 
     @Override
     public void collides(Collider collider) {
-        if (collider instanceof TrashSpawner.Trash trash && trashBag.size() < MAX_TRASH) {
+        if (collider instanceof TrashSpawner.Trash  && trashBag.size() < MAX_TRASH) {
+            TrashSpawner.Trash trash = (TrashSpawner.Trash) collider;
             trash.destroy();
             trash.playClip();
             trashBag.add(trash);

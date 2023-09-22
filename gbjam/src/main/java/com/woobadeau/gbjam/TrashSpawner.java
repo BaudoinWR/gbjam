@@ -30,7 +30,7 @@ public class TrashSpawner extends Spawner {
     @Override
     protected Thing spawn() {
         spawned++;
-        return new Trash(Trash.TrashType.values()[RANDOM.nextInt(Trash.TrashType.values().length)]);
+        return new Trash(TrashType.values()[RANDOM.nextInt(TrashType.values().length)]);
     }
 
     @Override
@@ -73,20 +73,20 @@ public class TrashSpawner extends Spawner {
             return type.score;
         }
 
-        private enum TrashType {
-            CAN(0, 100, PICKUP_CAN_CLIP),
-            BROKEN_CAN(1, 200, PICKUP_CAN_CLIP),
-            BAG(2, 500, PICKUP_CAN_CLIP);
+    }
+    private enum TrashType {
+        CAN(0, 100, PICKUP_CAN_CLIP),
+        BROKEN_CAN(1, 200, PICKUP_CAN_CLIP),
+        BAG(2, 500, PICKUP_CAN_CLIP);
 
-            private final int score;
-            private final Clip clip;
-            private final int imageIndex;
+        private final int score;
+        private final Clip clip;
+        private final int imageIndex;
 
-            TrashType(int imageIndex, int score, Clip clip) {
-                this.imageIndex = imageIndex;
-                this.score = score;
-                this.clip = clip;
-            }
+        TrashType(int imageIndex, int score, Clip clip) {
+            this.imageIndex = imageIndex;
+            this.score = score;
+            this.clip = clip;
         }
     }
 }

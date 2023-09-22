@@ -5,17 +5,25 @@ import com.woobadeau.tinyengine.behavior.Behavior;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
 
+import static com.woobadeau.gbjam.GBJam.RANDOM;
+
 public class WobbleBehavior implements Behavior {
+    private final int offset;
+
+    public WobbleBehavior() {
+        offset = RANDOM.nextInt(9);
+    }
+
     @Override
     public void accept(Thing thing) {
         Vector2D wobble = new Vector2D(0, getYWobble());
         thing.move(wobble);
     }
 
-    private static int getYWobble() {
-        long ticks = TinyEngine.getTicks();
+    private int getYWobble() {
+        long ticks = TinyEngine.getTicks() + offset;
         if (ticks % 40 == 0) {
-            return 2;
+            return 1;
         }
         if (ticks % 30 == 0) {
             return 1;
@@ -24,7 +32,7 @@ public class WobbleBehavior implements Behavior {
             return -1;
         }
         if (ticks % 10 == 0) {
-            return -2;
+            return -1;
         }
         return 0;
     }

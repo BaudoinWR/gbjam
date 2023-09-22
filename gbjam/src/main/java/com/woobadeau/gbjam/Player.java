@@ -2,6 +2,7 @@ package com.woobadeau.gbjam;
 
 import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.behavior.ContainedBehavior;
+import com.woobadeau.tinyengine.sound.SoundFactory;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Collider;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
@@ -11,11 +12,27 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Timer;
 import java.util.logging.Logger;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Player extends Thing implements Collider {
+    private static final Clip ROCKET_CLIP;
+
+    static {
+        try {
+            ROCKET_CLIP = SoundFactory.getClip("/rockets.wav");
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private static final Timer TIMER = new Timer();
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
     private static final int MAX_TRASH = 9;
+    private static final double FUEL_OXYGEN_USAGE = 0.15;
+    private static final double BREATHING_OXYGEN_USAGE = 0.05;
     private final AnimatedSprite animatedSprite;
     private short lives = 3;
     private short maxLives = 3;
@@ -29,6 +46,8 @@ public class Player extends Thing implements Collider {
     private boolean moveDown;
     private boolean moveLeft;
     private boolean moveRight;
+    private double maxOxygen = 100;
+    private double oxygen = maxOxygen;
     private Collection<TrashSpawner.Trash> trashBag = new ArrayList<>();
 
     public Player() throws IOException {
@@ -53,12 +72,16 @@ public class Player extends Thing implements Collider {
             // if 0 then 1, if 1 then 0, if 2 then 3, if 3 then 2
             animationStep = animationStep == 1 ? 0 : animationStep == 3 ? 2 : (short) (animationStep + 1);
         }
-        doMove();
-        animatedSprite.setState(animationStep);
-        animatedSprite.moveTo(this.getPosition());
+        if (isVisible()) {
+            oxygen -= BREATHING_OXYGEN_USAGE;
+            doMove();
+            animatedSprite.setState(animationStep);
+            animatedSprite.moveTo(this.getPosition());
+        }
     }
 
     private void doMove() {
+        boolean rocketOn = false;
         if (!moveUp && !moveDown) {
             if (speedY < 0) {
                 speedY = speedY + deceleration;
@@ -69,6 +92,7 @@ public class Player extends Thing implements Collider {
                 speedY = 0;
             }
         } else {
+            rocketOn = true;
             if (moveUp) {
                 speedY = speedY - acceleration;
                 if (animationStep < 2) {
@@ -92,6 +116,7 @@ public class Player extends Thing implements Collider {
                 speedX = 0;
             }
         } else {
+            rocketOn = true;
             if (moveLeft) {
                 speedX = speedX - acceleration;
                 animatedSprite.setxFlipped(true);
@@ -113,6 +138,15 @@ public class Player extends Thing implements Collider {
         if (speedY < -maxSpeed) {
             speedY = -maxSpeed;
         }
+        if (rocketOn) {
+        oxygen -= (rocketOn ? 1 : 0)
+                * FUEL_OXYGEN_USAGE;
+            if (!ROCKET_CLIP.isActive()) {
+                ROCKET_CLIP.loop(Clip.LOOP_CONTINUOUSLY);
+            }
+        } else {
+            ROCKET_CLIP.stop();
+        }
         move(new Vector2D(speedX, speedY));
     }
 
@@ -125,11 +159,40 @@ public class Player extends Thing implements Collider {
     }
 
     @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        getThings().forEach(thing -> thing.setVisible(visible));
+    }
+
+    @Override
     public void collides(Collider collider) {
-        if (collider instanceof TrashSpawner.Trash && trashBag.size() < MAX_TRASH) {
-            ((TrashSpawner.Trash) collider).destroy();
-            trashBag.add((TrashSpawner.Trash) collider);
+        if (collider instanceof TrashSpawner.Trash trash && trashBag.size() < MAX_TRASH) {
+            trash.destroy();
+            trash.playClip();
+            trashBag.add(trash);
+        } else if (collider instanceof Ship) {
+            if (trashBag.size() > 0) {
+                setVisible(false);
+                oxygen = maxOxygen;
+                speedX = speedY = 0;
+                TIMER.schedule(new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        setVisible(true);
+                    }
+                }, 2000);
+                trashBag.clear();
+                ROCKET_CLIP.stop();
+            }
         }
+    }
+
+    public double getMaxOxygen() {
+        return maxOxygen;
+    }
+
+    public double getOxygen() {
+        return oxygen;
     }
 
     @Override

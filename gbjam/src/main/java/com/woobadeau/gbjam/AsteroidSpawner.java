@@ -53,7 +53,7 @@ public class AsteroidSpawner extends Spawner {
 
         private Asteroid() {
             this.quadrant = Quadrant.values()[RANDOM.nextInt(Quadrant.values().length)];
-            speed = RANDOM.nextDouble(MIN_SPEED, MAX_SPEED);
+            speed = MIN_SPEED + RANDOM.nextDouble() * (MAX_SPEED - MIN_SPEED);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {

@@ -31,8 +31,8 @@ public class GBJam {
     }
 
     public static void main(String... args) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-        new TinyEngine(WIDTH, HEIGHT, 5, () -> {}).start();
         TinyEngine.debug = true;
         new GameController();
+        new TinyEngine(WIDTH, HEIGHT, 5, () -> {}).start();
     }
 }

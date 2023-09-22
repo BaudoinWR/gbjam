@@ -75,6 +75,7 @@ public class GameController extends Thing {
     }
 
     private void setup() throws IOException {
+        TinyEngine.resetTicks();
         player = new Player();
         player.moveTo(new Vector2D(80, 72));
         playerUI = new PlayerUI(player);

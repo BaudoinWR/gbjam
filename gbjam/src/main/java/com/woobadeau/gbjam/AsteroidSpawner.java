@@ -1,6 +1,8 @@
 package com.woobadeau.gbjam;
 
 import com.woobadeau.tinyengine.TinyEngine;
+import com.woobadeau.tinyengine.behavior.DestroyOutOfScreenBehavior;
+import com.woobadeau.tinyengine.sound.SoundFactory;
 import com.woobadeau.tinyengine.things.Spawner;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Collider;
@@ -9,9 +11,14 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import static com.woobadeau.gbjam.GBJam.BIG_SPRITE_SHEET;
 import static com.woobadeau.gbjam.GBJam.HEIGHT;
@@ -24,28 +31,39 @@ public class AsteroidSpawner extends Spawner {
     private static final double MIN_SPEED = 2;
     private static final int WARNING_TIME = 2000;
     private static final BufferedImage WARNING_SPRITE = SPRITE_SHEET.getImage(5);
-
     private static final long MIN_TIME_BETWEEN_ASTEROIDS = 5000;
-    private static final long PERCENT_CHANCE_SPAWN = 5;
+    private static final long PERCENT_CHANCE_SPAWN = 3;
     private static final int ROTATION_SPEED = 5;
+    private static final Clip WARNING_SOUND;
+    private int exist = 0;
 
-    long lastSpawned = 0;
+    static {
+        try {
+            WARNING_SOUND = SoundFactory.getClip("/warning.wav");
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    long lastSpawned = Instant.now().plus(Duration.ofSeconds(5)).toEpochMilli();
 
     @Override
     protected Thing spawn() {
         lastSpawned = Instant.now().toEpochMilli();
+        exist++;
         return new Asteroid();
     }
 
     @Override
     protected int shouldSpawn() {
-        if (Instant.now().toEpochMilli() - lastSpawned < MIN_TIME_BETWEEN_ASTEROIDS) {
+        if (Instant.now().toEpochMilli() - lastSpawned < MIN_TIME_BETWEEN_ASTEROIDS - (TinyEngine.getTicks() * 5)) {
             return 0;
         }
-        return RANDOM.nextInt(100) < PERCENT_CHANCE_SPAWN ? 1 : 0;
+        return RANDOM.nextInt(100) < PERCENT_CHANCE_SPAWN / (exist + 1)  ? 1 : 0;
     }
 
-    private class Asteroid extends Thing implements Collider {
+
+    public class Asteroid extends Thing implements Collider {
         boolean isWarning = true;
         final Quadrant quadrant;
         BufferedImage asteroidSprite;
@@ -54,19 +72,34 @@ public class AsteroidSpawner extends Spawner {
         private Asteroid() {
             this.quadrant = Quadrant.values()[RANDOM.nextInt(Quadrant.values().length)];
             speed = MIN_SPEED + RANDOM.nextDouble() * (MAX_SPEED - MIN_SPEED);
+            WARNING_SOUND.loop(Clip.LOOP_CONTINUOUSLY);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    isWarning = false;
+                    WARNING_SOUND.stop();
                     asteroidSprite = BIG_SPRITE_SHEET.getImage(RANDOM.nextInt(2));
+                    isWarning = false;
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            getBehaviors().add(new DestroyOutOfScreenBehavior());
+                        }
+                    }, 1000);
                 }
             }, WARNING_TIME);
             moveTo(new Vector2D(quadrant.xSpawn, quadrant.ySpawn));
         }
 
         @Override
+        public void onRemove() {
+            super.onRemove();
+            exist--;
+        }
+
+        @Override
         public void update() {
             super.update();
+            lastSpawned = Instant.now().toEpochMilli();
             if (!isWarning) {
                 move(new Vector2D(quadrant.xSpeed * speed, quadrant.ySpeed * speed));
             }
@@ -103,13 +136,17 @@ public class AsteroidSpawner extends Spawner {
 
     enum Quadrant {
         TOP_LEFT_TOP(0, 0, true, 8, -31, 0, 1),
+        MIDDLE_TOP(70, 0, false, 68, -31, 0, 1),
         TOP_LEFT_LEFT(0, 0, false, -31, 13, 1, 0),
-        TOP_RIGHT_TOP(WIDTH - 96, 0, true, WIDTH - 35, -31, 0, 1),
+        TOP_RIGHT_TOP(WIDTH - 20, 0, true, WIDTH - 35, -31, 0, 1),
+        MIDDLE_RIGHT(WIDTH - 20, 60, true, WIDTH, 65, -1, 0),
         TOP_RIGHT_RIGHT(WIDTH - 32, 0, false, WIDTH, 13, -1, 0),
         BOTTOM_LEFT_BOTTOM(0, HEIGHT - 32, true, 0, HEIGHT - 5, 0, -1),
-        BOTTOM_LEFT_LEFT(0, HEIGHT - 96, false, -31, HEIGHT - 31, 1, 0),
-        BOTTOM_RIGHT_BOTTOM(WIDTH - 96, HEIGHT - 32, true, WIDTH - 31, HEIGHT - 5, 0, -1),
-        BOTTOM_RIGHT_RIGHT(WIDTH - 32, HEIGHT - 96, false, WIDTH - 5, HEIGHT - 31, -1, 0);
+        MIDDLE_LEFT(0, HEIGHT / 2, true, 0, HEIGHT / 2, 1, 0),
+        BOTTOM_LEFT_LEFT(0, HEIGHT - 20, false, -31, HEIGHT - 31, 1, 0),
+        BOTTOM_RIGHT_BOTTOM(WIDTH - 20, HEIGHT - 32, true, WIDTH - 31, HEIGHT - 5, 0, -1),
+        MIDDLE_BOTTOM(WIDTH / 2, HEIGHT - 32, false, WIDTH / 2, HEIGHT - 5, 0, -1),
+        BOTTOM_RIGHT_RIGHT(WIDTH - 32, HEIGHT - 20, false, WIDTH - 5, HEIGHT - 31, -1, 0);
 
         final int xWarn;
         final int yWarn;

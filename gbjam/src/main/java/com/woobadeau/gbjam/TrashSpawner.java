@@ -25,8 +25,8 @@ public class TrashSpawner extends Spawner {
             throw new RuntimeException(e);
         }
     }
-    private static int spawned = 0;
-    private static int maxSpawned = 5;
+    private int spawned = 0;
+    private static final int MAX_SPAWNED = 5;
     @Override
     protected Thing spawn() {
         spawned++;
@@ -35,7 +35,7 @@ public class TrashSpawner extends Spawner {
 
     @Override
     protected int shouldSpawn() {
-        return spawned < maxSpawned && TinyEngine.getTicks() % 100 == 0 ? 1 : 0;
+        return spawned < MAX_SPAWNED && TinyEngine.getTicks() % 100 == 0 ? 1 : 0;
     }
 
     class Trash extends Sprite implements Collider {

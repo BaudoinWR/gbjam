@@ -78,6 +78,9 @@ public class Player extends Thing implements Collider {
             animatedSprite.setState(animationStep);
             animatedSprite.moveTo(this.getPosition());
         }
+        if (oxygen <= 0) {
+            ROCKET_CLIP.stop();
+        }
     }
 
     private void doMove() {
@@ -159,6 +162,12 @@ public class Player extends Thing implements Collider {
     }
 
     @Override
+    public void setActive(boolean active) {
+        super.setActive(active);
+        ROCKET_CLIP.stop();
+    }
+
+    @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         getThings().forEach(thing -> thing.setVisible(visible));
@@ -185,6 +194,8 @@ public class Player extends Thing implements Collider {
                 trashBag.clear();
                 ROCKET_CLIP.stop();
             }
+        } else if (collider instanceof AsteroidSpawner.Asteroid) {
+            oxygen = 0;
         }
     }
 

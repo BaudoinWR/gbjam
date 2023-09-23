@@ -6,8 +6,11 @@ import com.woobadeau.tinyengine.things.physics.Vector2D;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import javax.sound.sampled.Clip;
 
 import static com.woobadeau.gbjam.GBJam.HEIGHT;
+import static com.woobadeau.gbjam.GBJam.MUSIC;
+import static com.woobadeau.gbjam.GBJam.SPRITE_FONT_TEXT;
 import static com.woobadeau.gbjam.GBJam.WIDTH;
 import static com.woobadeau.gbjam.PlayerUI.DARK_GREEN;
 
@@ -62,10 +65,12 @@ public class GameController extends Thing {
             closerGraphics.fillRect(0, (int) (HEIGHT - closingTicks), WIDTH, HEIGHT);
             graphics.drawImage(closingScreen, 0, 0, null);
             if (isGameOver()) {
-                BufferedImage gameOver = playerUI.spriteFontText.getText("GAME OVER", 1);
-                BufferedImage pressA = playerUI.spriteFontText.getText("PRESS A TO RESTART", 1);
-                graphics.drawImage(gameOver, (WIDTH - gameOver.getWidth()) / 2, (HEIGHT - gameOver.getHeight()) / 2 - 10, null);
-                graphics.drawImage(pressA, (WIDTH - pressA.getWidth()) / 2, (HEIGHT - pressA.getHeight()) / 2 + 10, null);
+                BufferedImage gameOver = SPRITE_FONT_TEXT.getText("GAME OVER", 1);
+                BufferedImage score = SPRITE_FONT_TEXT.getText("SCORE:" + player.getScore(), 1);
+                BufferedImage pressA = SPRITE_FONT_TEXT.getText("PRESS A TO RESTART", 1);
+                graphics.drawImage(gameOver, (WIDTH - gameOver.getWidth()) / 2, (HEIGHT - gameOver.getHeight()) / 2 - 15, null);
+                graphics.drawImage(score, (WIDTH - score.getWidth()) / 2, (HEIGHT - score.getHeight()) / 2, null);
+                graphics.drawImage(pressA, (WIDTH - pressA.getWidth()) / 2, (HEIGHT - pressA.getHeight()) / 2 + 15, null);
             }
         }
     }
@@ -84,9 +89,11 @@ public class GameController extends Thing {
         closing = false;
         closingTicks = 0;
         asteroidSpawner = new AsteroidSpawner();
+        MUSIC.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
     void reset() {
+        MUSIC.stop();
         player.destroy();
         playerUI.destroy();
         trashSpawner.destroy();

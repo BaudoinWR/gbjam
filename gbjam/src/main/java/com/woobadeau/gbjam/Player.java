@@ -24,6 +24,7 @@ public class Player extends Thing implements Collider {
     static {
         try {
             ROCKET_CLIP = SoundFactory.getClip("/rockets.wav");
+            SoundFactory.setVolume(ROCKET_CLIP, 0.3f);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             throw new RuntimeException(e);
         }
@@ -33,6 +34,7 @@ public class Player extends Thing implements Collider {
     private static final int MAX_TRASH = 9;
     private static final double FUEL_OXYGEN_USAGE = 0.15;
     private static final double BREATHING_OXYGEN_USAGE = 0.05;
+    private static final double[] SCORE_MULTIPLIER = {1, 1, 1.5, 1.5, 1.75, 2, 2, 2.5, 5};
     private final AnimatedSprite animatedSprite;
     private short lives = 3;
     private short maxLives = 3;
@@ -49,6 +51,8 @@ public class Player extends Thing implements Collider {
     private double maxOxygen = 100;
     private double oxygen = maxOxygen;
     private Collection<TrashSpawner.Trash> trashBag = new ArrayList<>();
+    private int temporaryScore;
+    private int score;
 
     public Player() throws IOException {
         animatedSprite = SpriteFactory.createAnimatedSprite("/gbspacedude.png", 2, 2);
@@ -180,9 +184,13 @@ public class Player extends Thing implements Collider {
             trash.destroy();
             trash.playClip();
             trashBag.add(trash);
+            temporaryScore += trash.getScore();
+            new Popup("" + trash.getScore(), trash.getPosition(), 35);
         } else if (collider instanceof Ship) {
             if (trashBag.size() > 0) {
                 setVisible(false);
+                score += temporaryScore * SCORE_MULTIPLIER[trashBag.size() - 1];
+                temporaryScore = 0;
                 oxygen = maxOxygen;
                 speedX = speedY = 0;
                 TIMER.schedule(new java.util.TimerTask() {
@@ -218,5 +226,12 @@ public class Player extends Thing implements Collider {
 
     public void setTrashBag(Collection<TrashSpawner.Trash> trashBag) {
         this.trashBag = trashBag;
+    }
+
+    public int getScore() {
+        return score;
+    }
+    public int getTemporaryScore() {
+        return temporaryScore;
     }
 }

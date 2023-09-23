@@ -21,6 +21,7 @@ public class TrashSpawner extends Spawner {
     static {
         try {
             PICKUP_CAN_CLIP = SoundFactory.getClip("/pickup_can.wav");
+            SoundFactory.setVolume(PICKUP_CAN_CLIP, 0.3f);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             throw new RuntimeException(e);
         }

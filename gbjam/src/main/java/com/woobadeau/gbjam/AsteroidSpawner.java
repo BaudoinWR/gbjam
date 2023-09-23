@@ -40,6 +40,7 @@ public class AsteroidSpawner extends Spawner {
     static {
         try {
             WARNING_SOUND = SoundFactory.getClip("/warning.wav");
+            SoundFactory.setVolume(WARNING_SOUND, 0.2f);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +73,7 @@ public class AsteroidSpawner extends Spawner {
         private Asteroid() {
             this.quadrant = Quadrant.values()[RANDOM.nextInt(Quadrant.values().length)];
             speed = MIN_SPEED + RANDOM.nextDouble() * (MAX_SPEED - MIN_SPEED);
-            WARNING_SOUND.loop(Clip.LOOP_CONTINUOUSLY);
+            WARNING_SOUND.loop(2);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {

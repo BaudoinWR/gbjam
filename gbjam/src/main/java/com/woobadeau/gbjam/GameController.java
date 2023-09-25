@@ -1,18 +1,15 @@
 package com.woobadeau.gbjam;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.sound.sampled.Clip;
 
-import static com.woobadeau.gbjam.GBJam.HEIGHT;
-import static com.woobadeau.gbjam.GBJam.MUSIC;
-import static com.woobadeau.gbjam.GBJam.SPRITE_FONT_TEXT;
-import static com.woobadeau.gbjam.GBJam.WIDTH;
-import static com.woobadeau.gbjam.PlayerUI.DARK_GREEN;
+import static com.woobadeau.gbjam.MainClass.HEIGHT;
+import static com.woobadeau.gbjam.MainClass.MUSIC;
+import static com.woobadeau.gbjam.MainClass.WIDTH;
 
 public class GameController extends Thing {
 
@@ -27,16 +24,16 @@ public class GameController extends Thing {
     public GameController() throws IOException {
         setup();
         setZIndex(Integer.MAX_VALUE);
-        TinyEngine.addKeyBinding("A", () -> {
-            if (isGameOver()) {
-                reset();
-                try {
-                    setup();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        //TinyEngine.addKeyBinding("A", () -> {
+        //    if (isGameOver()) {
+        //        reset();
+        //        try {
+        //            setup();
+        //        } catch (IOException e) {
+        //            throw new RuntimeException(e);
+        //        }
+        //    }
+        //});
     }
 
     @Override
@@ -54,23 +51,23 @@ public class GameController extends Thing {
     }
 
     @Override
-    public void draw(Graphics graphics) {
+    public void draw(SpriteBatch spriteBatch) {
         if (closing) {
-            BufferedImage closingScreen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
-            Graphics closerGraphics = closingScreen.getGraphics();
-            closerGraphics.setColor(DARK_GREEN);
-            closerGraphics.fillRect(0, 0, WIDTH, (int) closingTicks);
-            closerGraphics.fillRect(0, 0, (int) closingTicks, HEIGHT);
-            closerGraphics.fillRect((int) (WIDTH - closingTicks), 0, WIDTH, HEIGHT);
-            closerGraphics.fillRect(0, (int) (HEIGHT - closingTicks), WIDTH, HEIGHT);
-            graphics.drawImage(closingScreen, 0, 0, null);
+            //BufferedImage closingScreen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+            //Graphics closerGraphics = closingScreen.getGraphics();
+            //closerGraphics.setColor(DARK_GREEN);
+            //closerGraphics.fillRect(0, 0, WIDTH, (int) closingTicks);
+            //closerGraphics.fillRect(0, 0, (int) closingTicks, HEIGHT);
+            //closerGraphics.fillRect((int) (WIDTH - closingTicks), 0, WIDTH, HEIGHT);
+            //closerGraphics.fillRect(0, (int) (HEIGHT - closingTicks), WIDTH, HEIGHT);
+            //graphics.drawImage(closingScreen, 0, 0, null);
             if (isGameOver()) {
-                BufferedImage gameOver = SPRITE_FONT_TEXT.getText("GAME OVER", 1);
-                BufferedImage score = SPRITE_FONT_TEXT.getText("SCORE:" + player.getScore(), 1);
-                BufferedImage pressA = SPRITE_FONT_TEXT.getText("PRESS A TO RESTART", 1);
-                graphics.drawImage(gameOver, (WIDTH - gameOver.getWidth()) / 2, (HEIGHT - gameOver.getHeight()) / 2 - 15, null);
-                graphics.drawImage(score, (WIDTH - score.getWidth()) / 2, (HEIGHT - score.getHeight()) / 2, null);
-                graphics.drawImage(pressA, (WIDTH - pressA.getWidth()) / 2, (HEIGHT - pressA.getHeight()) / 2 + 15, null);
+                //Texture gameOver = SPRITE_FONT_TEXT.getText("GAME OVER", 1);
+                //Texture score = SPRITE_FONT_TEXT.getText("SCORE:" + player.getScore(), 1);
+                //Texture pressA = SPRITE_FONT_TEXT.getText("PRESS A TO RESTART", 1);
+                //graphics.drawImage(gameOver, (WIDTH - gameOver.getWidth()) / 2, (HEIGHT - gameOver.getHeight()) / 2 - 15, null);
+                //graphics.drawImage(score, (WIDTH - score.getWidth()) / 2, (HEIGHT - score.getHeight()) / 2, null);
+                //graphics.drawImage(pressA, (WIDTH - pressA.getWidth()) / 2, (HEIGHT - pressA.getHeight()) / 2 + 15, null);
             }
         }
     }

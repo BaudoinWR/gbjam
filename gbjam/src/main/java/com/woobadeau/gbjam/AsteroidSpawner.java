@@ -1,5 +1,8 @@
 package com.woobadeau.gbjam;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.behavior.DestroyOutOfScreenBehavior;
 import com.woobadeau.tinyengine.sound.SoundFactory;
@@ -8,29 +11,26 @@ import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Collider;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import static com.woobadeau.gbjam.GBJam.BIG_SPRITE_SHEET;
-import static com.woobadeau.gbjam.GBJam.HEIGHT;
-import static com.woobadeau.gbjam.GBJam.RANDOM;
-import static com.woobadeau.gbjam.GBJam.SPRITE_SHEET;
-import static com.woobadeau.gbjam.GBJam.WIDTH;
+import static com.woobadeau.gbjam.MainClass.BIG_SPRITE_SHEET;
+import static com.woobadeau.gbjam.MainClass.HEIGHT;
+import static com.woobadeau.gbjam.MainClass.SPRITE_SHEET;
+import static com.woobadeau.gbjam.MainClass.WIDTH;
 
 public class AsteroidSpawner extends Spawner {
     private static final double MAX_SPEED = 5;
     private static final double MIN_SPEED = 2;
     private static final int WARNING_TIME = 2000;
-    private static final BufferedImage WARNING_SPRITE = SPRITE_SHEET.getImage(5);
+    private static final TextureRegion WARNING_SPRITE = SPRITE_SHEET.getSubImage(5);
     private static final long MIN_TIME_BETWEEN_ASTEROIDS = 5000;
     private static final long PERCENT_CHANCE_SPAWN = 3;
     private static final int ROTATION_SPEED = 5;
@@ -60,25 +60,25 @@ public class AsteroidSpawner extends Spawner {
         if (Instant.now().toEpochMilli() - lastSpawned < MIN_TIME_BETWEEN_ASTEROIDS - (TinyEngine.getTicks() * 5)) {
             return 0;
         }
-        return RANDOM.nextInt(100) < PERCENT_CHANCE_SPAWN / (exist + 1)  ? 1 : 0;
+        return new Random().nextInt(100) < PERCENT_CHANCE_SPAWN / (exist + 1)  ? 1 : 0;
     }
 
 
     public class Asteroid extends Thing implements Collider {
         boolean isWarning = true;
         final Quadrant quadrant;
-        BufferedImage asteroidSprite;
+        TextureRegion asteroidSprite;
         double speed;
 
         private Asteroid() {
-            this.quadrant = Quadrant.values()[RANDOM.nextInt(Quadrant.values().length)];
-            speed = MIN_SPEED + RANDOM.nextDouble() * (MAX_SPEED - MIN_SPEED);
+            this.quadrant = Quadrant.values()[new Random().nextInt(Quadrant.values().length)];
+            speed = MIN_SPEED + new Random().nextDouble() * (MAX_SPEED - MIN_SPEED);
             WARNING_SOUND.loop(2);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
                     WARNING_SOUND.stop();
-                    asteroidSprite = BIG_SPRITE_SHEET.getImage(RANDOM.nextInt(2));
+                    asteroidSprite = BIG_SPRITE_SHEET.getSubImage(new Random().nextInt(2));
                     isWarning = false;
                     new Timer().schedule(new TimerTask() {
                         @Override
@@ -107,18 +107,19 @@ public class AsteroidSpawner extends Spawner {
         }
 
         @Override
-        public void draw(Graphics graphics) {
+        public void draw(SpriteBatch spriteBatch) {
+            //SpriteBatch spriteBatch = TinyEngine.getSpriteBatch();
+            //spriteBatch.begin();
             if (isWarning) {
-                graphics.drawImage(WARNING_SPRITE, quadrant.xWarn, quadrant.yWarn, null);
+                spriteBatch.draw(WARNING_SPRITE, quadrant.xWarn, quadrant.yWarn);
             } else {
                 double rotationRequired = Math.toRadians(TinyEngine.getTicks() * ROTATION_SPEED);
-                double locationX = asteroidSprite.getWidth() / 2;
-                double locationY = asteroidSprite.getHeight() / 2;
-                AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX, locationY);
-                AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+                double locationX = asteroidSprite.getRegionWidth() / 2;
+                double locationY = asteroidSprite.getRegionHeight() / 2;
 
-                graphics.drawImage(op.filter(asteroidSprite, null), (int) getPosition().x, (int) getPosition().y, null);
+                spriteBatch.draw(asteroidSprite, (int) getPosition().x, (int) getPosition().y);
             }
+            //spriteBatch.end();
         }
 
         @Override
@@ -131,7 +132,7 @@ public class AsteroidSpawner extends Spawner {
             if (isWarning) {
                 return new Rectangle(-10, -10, 0, 0);
             }
-            return new Rectangle((int) getPosition().x + 3, (int) getPosition().y + 3, asteroidSprite.getWidth() - 6, asteroidSprite.getHeight() - 3);
+            return new Rectangle((int) getPosition().x + 3, (int) getPosition().y + 3, asteroidSprite.getRegionWidth() - 6, asteroidSprite.getRegionHeight() - 3);
         }
     }
 

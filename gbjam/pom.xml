@@ -61,7 +61,7 @@
                     <finalName>SpaceLitter</finalName>
                     <archive>
                         <manifest>
-                            <mainClass>com.woobadeau.gbjam.GBJam</mainClass>
+                            <mainClass>com.woobadeau.gbjam.MainClass</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

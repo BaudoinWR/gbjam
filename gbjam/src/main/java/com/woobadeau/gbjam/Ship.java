@@ -8,14 +8,14 @@ import com.woobadeau.tinyengine.things.sprites.SpriteFactory;
 import java.awt.*;
 import java.io.IOException;
 
-import static com.woobadeau.gbjam.GBJam.HEIGHT;
+import static com.woobadeau.gbjam.MainClass.HEIGHT;
 
 public class Ship extends Thing implements Collider {
     protected Ship() throws IOException {
-        getThings().add(SpriteFactory.createSprite("/gbship.png"));
-        addBehavior(new ContainedBehavior(2, HEIGHT - 20, 5, HEIGHT - 30));
+        getThings().add(SpriteFactory.createSprite("gbship.png"));
+        addBehavior(new ContainedBehavior(2, 20, 5, 30));
         addBehavior(new WobbleBehavior());
-        moveTo(new Vector2D(2, HEIGHT - 25));
+        moveTo(new Vector2D(2, 25));
     }
 
     @Override

@@ -55,18 +55,18 @@ public class Player extends Thing implements Collider {
     private int score;
 
     public Player() throws IOException {
-        animatedSprite = SpriteFactory.createAnimatedSprite("/gbspacedude.png", 2, 2);
+        animatedSprite = SpriteFactory.createAnimatedSprite("gbspacedude.png", 2, 2);
         getThings().add(animatedSprite);
         addBehavior(new ContainedBehavior(-2, 12, 160-16, 144-16));
         addBehavior(new WobbleBehavior());
-        TinyEngine.addKeyBinding("pressed UP", () -> moveUp = true );
-        TinyEngine.addKeyBinding("released UP", () -> moveUp = false );
-        TinyEngine.addKeyBinding("pressed DOWN", () -> moveDown = true );
-        TinyEngine.addKeyBinding("released DOWN", () -> moveDown = false );
-        TinyEngine.addKeyBinding("pressed LEFT", () -> moveLeft = true );
-        TinyEngine.addKeyBinding("released LEFT", () -> moveLeft = false );
-        TinyEngine.addKeyBinding("pressed RIGHT", () -> moveRight = true );
-        TinyEngine.addKeyBinding("released RIGHT", () -> moveRight = false );
+        //TinyEngine.addKeyBinding("pressed UP", () -> moveUp = true );
+        //TinyEngine.addKeyBinding("released UP", () -> moveUp = false );
+        //TinyEngine.addKeyBinding("pressed DOWN", () -> moveDown = true );
+        //TinyEngine.addKeyBinding("released DOWN", () -> moveDown = false );
+        //TinyEngine.addKeyBinding("pressed LEFT", () -> moveLeft = true );
+        //TinyEngine.addKeyBinding("released LEFT", () -> moveLeft = false );
+        //TinyEngine.addKeyBinding("pressed RIGHT", () -> moveRight = true );
+        //TinyEngine.addKeyBinding("released RIGHT", () -> moveRight = false );
     }
 
     @Override

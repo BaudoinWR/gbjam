@@ -4,14 +4,13 @@ import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.behavior.Behavior;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
-
-import static com.woobadeau.gbjam.GBJam.RANDOM;
+import java.util.Random;
 
 public class WobbleBehavior implements Behavior {
     private final int offset;
 
     public WobbleBehavior() {
-        offset = RANDOM.nextInt(9);
+        offset = new Random().nextInt(9);
     }
 
     @Override

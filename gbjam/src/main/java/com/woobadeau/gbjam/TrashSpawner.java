@@ -1,5 +1,8 @@
 package com.woobadeau.gbjam;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.sound.SoundFactory;
 import com.woobadeau.tinyengine.things.Spawner;
@@ -9,11 +12,10 @@ import com.woobadeau.tinyengine.things.physics.Vector2D;
 import com.woobadeau.tinyengine.things.sprites.Sprite;
 import java.awt.*;
 import java.io.IOException;
+import java.util.Random;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-
-import static com.woobadeau.gbjam.GBJam.RANDOM;
 
 public class TrashSpawner extends Spawner {
     private static final Clip PICKUP_CAN_CLIP;
@@ -31,7 +33,7 @@ public class TrashSpawner extends Spawner {
     @Override
     protected Thing spawn() {
         spawned++;
-        return new Trash(TrashType.values()[RANDOM.nextInt(TrashType.values().length)]);
+        return new Trash(TrashType.values()[new Random().nextInt(TrashType.values().length)]);
     }
 
     @Override
@@ -39,15 +41,22 @@ public class TrashSpawner extends Spawner {
         return spawned < MAX_SPAWNED && TinyEngine.getTicks() % 100 == 0 ? 1 : 0;
     }
 
-    class Trash extends Sprite implements Collider {
+    class Trash extends Thing implements Collider {
 
         private final TrashType type;
+        private final TextureRegion image;
 
         public Trash(TrashType type) {
-            super(GBJam.SPRITE_SHEET.getImage(type.imageIndex), 1);
+            //super(, 1);
+            image = MainClass.SPRITE_SHEET.getSubImage(type.imageIndex);
             this.type = type;
             addBehavior(new WobbleBehavior());
-            moveTo(new Vector2D(RANDOM.nextInt(GBJam.WIDTH - 8), RANDOM.nextInt(GBJam.HEIGHT - 22) + 13));
+            moveTo(new Vector2D(new Random().nextInt(MainClass.WIDTH - 8), new Random().nextInt(MainClass.HEIGHT - 22) + 13));
+        }
+
+        @Override
+        public void draw(SpriteBatch spriteBatch) {
+            spriteBatch.draw(image, (float) getPosition().x, (float) getPosition().y);
         }
 
         public void onRemove() {

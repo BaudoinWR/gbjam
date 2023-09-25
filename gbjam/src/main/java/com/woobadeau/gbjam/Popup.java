@@ -16,12 +16,17 @@
  */
 package com.woobadeau.gbjam;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.woobadeau.tinyengine.TinyEngine;
+import com.woobadeau.tinyengine.libgdx.NestableFrameBuffer;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 
-import static com.woobadeau.gbjam.GBJam.SPRITE_FONT_TEXT;
+import static com.woobadeau.gbjam.MainClass.SPRITE_FONT_TEXT;
 
 public class Popup extends Thing {
     private final static int speed = 1;
@@ -36,12 +41,21 @@ public class Popup extends Thing {
     }
 
     @Override
-    public void draw(Graphics graphics) {
-        super.draw(graphics);
-        //graphics.setColor(PlayerUI.MID_GREEN);
-        //graphics.fillRoundRect((int) this.getPosition().x, (int) this.getPosition().y, 2 + text.length() * 4, 7, 2, 0);
-        BufferedImage textImage = SPRITE_FONT_TEXT.getText(text, 1);
-        graphics.drawImage(textImage, (int) this.getPosition().x + 1, (int) this.getPosition().y + 1, null);
+    public void draw(SpriteBatch spriteBatch) {
+        Texture text = SPRITE_FONT_TEXT.getText(this.text, 1);
+        //NestableFrameBuffer nestableFrameBuffer = TinyEngine.getFrameBuffer();
+        //nestableFrameBuffer.begin();
+        ScreenUtils.clear(Color.CLEAR);
+        //SpriteBatch spriteBatch = TinyEngine.getSpriteBatch();
+        //spriteBatch.begin();
+        spriteBatch.draw(text, (int) this.getPosition().x + 1, (int) this.getPosition().y + 1);
+        text.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        Sprite sprite = new Sprite(text);
+        sprite.flip(false, true);
+        sprite.setSize((float)TinyEngine.width, (float)TinyEngine.height);
+        sprite.setPosition(0.0F, 0.0F);
+        sprite.draw(spriteBatch);
+        //TinyEngine.drawBufferToBatch(spriteBatch, nestableFrameBuffer);
     }
 
     @Override

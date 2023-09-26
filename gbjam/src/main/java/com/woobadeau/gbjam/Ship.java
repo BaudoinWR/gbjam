@@ -13,9 +13,9 @@ import static com.woobadeau.gbjam.MainClass.HEIGHT;
 public class Ship extends Thing implements Collider {
     protected Ship() throws IOException {
         getThings().add(SpriteFactory.createSprite("gbship.png"));
-        addBehavior(new ContainedBehavior(2, 20, 5, 30));
+        addBehavior(new ContainedBehavior(2, 6, 5, 3));
         addBehavior(new WobbleBehavior());
-        moveTo(new Vector2D(2, 25));
+        moveTo(new Vector2D(2, 4));
     }
 
     @Override

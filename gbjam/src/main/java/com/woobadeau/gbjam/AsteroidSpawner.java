@@ -14,7 +14,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.sound.sampled.Clip;
@@ -23,6 +22,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import static com.woobadeau.gbjam.MainClass.BIG_SPRITE_SHEET;
 import static com.woobadeau.gbjam.MainClass.HEIGHT;
+import static com.woobadeau.gbjam.MainClass.RANDOM;
 import static com.woobadeau.gbjam.MainClass.SPRITE_SHEET;
 import static com.woobadeau.gbjam.MainClass.WIDTH;
 
@@ -60,7 +60,7 @@ public class AsteroidSpawner extends Spawner {
         if (Instant.now().toEpochMilli() - lastSpawned < MIN_TIME_BETWEEN_ASTEROIDS - (TinyEngine.getTicks() * 5)) {
             return 0;
         }
-        return new Random().nextInt(100) < PERCENT_CHANCE_SPAWN / (exist + 1)  ? 1 : 0;
+        return RANDOM.nextInt(100) < PERCENT_CHANCE_SPAWN / (exist + 1)  ? 1 : 0;
     }
 
 
@@ -71,14 +71,14 @@ public class AsteroidSpawner extends Spawner {
         double speed;
 
         private Asteroid() {
-            this.quadrant = Quadrant.values()[new Random().nextInt(Quadrant.values().length)];
-            speed = MIN_SPEED + new Random().nextDouble() * (MAX_SPEED - MIN_SPEED);
+            this.quadrant = Quadrant.values()[RANDOM.nextInt(Quadrant.values().length)];
+            speed = MIN_SPEED + RANDOM.nextDouble() * (MAX_SPEED - MIN_SPEED);
             WARNING_SOUND.loop(2);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
                     WARNING_SOUND.stop();
-                    asteroidSprite = BIG_SPRITE_SHEET.getSubImage(new Random().nextInt(2));
+                    asteroidSprite = BIG_SPRITE_SHEET.getSubImage(RANDOM.nextInt(2));
                     isWarning = false;
                     new Timer().schedule(new TimerTask() {
                         @Override
@@ -146,8 +146,8 @@ public class AsteroidSpawner extends Spawner {
         BOTTOM_LEFT_BOTTOM(0, HEIGHT - 32, true, 0, HEIGHT - 5, 0, -1),
         MIDDLE_LEFT(0, HEIGHT / 2, true, 0, HEIGHT / 2, 1, 0),
         BOTTOM_LEFT_LEFT(0, HEIGHT - 20, false, -31, HEIGHT - 31, 1, 0),
-        BOTTOM_RIGHT_BOTTOM(WIDTH - 20, HEIGHT - 32, true, WIDTH - 31, HEIGHT - 5, 0, -1),
-        MIDDLE_BOTTOM(WIDTH / 2, HEIGHT - 32, false, WIDTH / 2, HEIGHT - 5, 0, -1),
+        BOTTOM_RIGHT_BOTTOM(WIDTH - 20, HEIGHT - 32, true, WIDTH - 31, HEIGHT - 36, 0, -1),
+        MIDDLE_BOTTOM(WIDTH / 2, HEIGHT - 32, false, WIDTH / 2, HEIGHT - 36, 0, -1),
         BOTTOM_RIGHT_RIGHT(WIDTH - 32, HEIGHT - 20, false, WIDTH - 5, HEIGHT - 31, -1, 0);
 
         final int xWarn;

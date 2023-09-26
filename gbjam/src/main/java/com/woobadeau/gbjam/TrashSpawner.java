@@ -17,6 +17,8 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import static com.woobadeau.gbjam.MainClass.RANDOM;
+
 public class TrashSpawner extends Spawner {
     private static final Clip PICKUP_CAN_CLIP;
 
@@ -33,7 +35,7 @@ public class TrashSpawner extends Spawner {
     @Override
     protected Thing spawn() {
         spawned++;
-        return new Trash(TrashType.values()[new Random().nextInt(TrashType.values().length)]);
+        return new Trash(TrashType.values()[RANDOM.nextInt(TrashType.values().length)]);
     }
 
     @Override
@@ -51,7 +53,7 @@ public class TrashSpawner extends Spawner {
             image = MainClass.SPRITE_SHEET.getSubImage(type.imageIndex);
             this.type = type;
             addBehavior(new WobbleBehavior());
-            moveTo(new Vector2D(new Random().nextInt(MainClass.WIDTH - 8), new Random().nextInt(MainClass.HEIGHT - 22) + 13));
+            moveTo(new Vector2D(RANDOM.nextInt(MainClass.WIDTH - 8), RANDOM.nextInt(MainClass.HEIGHT - 22) + 21));
         }
 
         @Override

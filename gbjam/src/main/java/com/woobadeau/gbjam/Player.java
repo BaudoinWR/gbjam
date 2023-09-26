@@ -1,5 +1,7 @@
 package com.woobadeau.gbjam;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.behavior.ContainedBehavior;
 import com.woobadeau.tinyengine.sound.SoundFactory;
@@ -89,6 +91,11 @@ public class Player extends Thing implements Collider {
 
     private void doMove() {
         boolean rocketOn = false;
+        boolean moveUp = Gdx.input.isKeyPressed(Input.Keys.UP);
+        boolean moveDown = Gdx.input.isKeyPressed(Input.Keys.DOWN);
+        boolean moveLeft = Gdx.input.isKeyPressed(Input.Keys.LEFT);
+        boolean moveRight = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+
         if (!moveUp && !moveDown) {
             if (speedY < 0) {
                 speedY = speedY + deceleration;
@@ -101,13 +108,13 @@ public class Player extends Thing implements Collider {
         } else {
             rocketOn = true;
             if (moveUp) {
-                speedY = speedY - acceleration;
+                speedY = speedY + acceleration;
                 if (animationStep < 2) {
                     animationStep = 2;
                 }
             }
             if (moveDown) {
-                speedY = speedY + acceleration;
+                speedY = speedY - acceleration;
                 if (animationStep > 2) {
                     animationStep = 0;
                 }

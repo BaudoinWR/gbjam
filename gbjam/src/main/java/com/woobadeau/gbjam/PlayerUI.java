@@ -1,5 +1,6 @@
 package com.woobadeau.gbjam;
 
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.woobadeau.tinyengine.TinyEngine;
@@ -13,6 +14,8 @@ import java.io.IOException;
 import java.util.Random;
 
 import static com.woobadeau.gbjam.MainClass.HEIGHT;
+import static com.woobadeau.gbjam.MainClass.RANDOM;
+import static com.woobadeau.gbjam.MainClass.SPRITE_FONT_TEXT;
 import static com.woobadeau.gbjam.MainClass.SPRITE_SHEET;
 import static com.woobadeau.gbjam.MainClass.WIDTH;
 
@@ -37,21 +40,37 @@ public class PlayerUI extends Thing {
     public void draw(SpriteBatch spriteBatch) {
         //super.draw(graphics);
         //// Items in bag
+        com.badlogic.gdx.graphics.g2d.Sprite text = SPRITE_FONT_TEXT.getText("" + player.getTrashBag().size(), 0);
+        spriteBatch.draw(text, WIDTH - 19, HEIGHT - 8);
         //graphics.drawImage(SPRITE_FONT_TEXT.getText("" + player.getTrashBag().size(), 0), WIDTH - 19, 3, null);
 //
         //// Oxygen
-        //int oxygenXStart = WIDTH - 36;
-        //int oxygenYStart = 13;
+        int oxygenXStart = WIDTH - 36;
+        int oxygenYStart = HEIGHT - 16;
         //graphics.setColor(LIGHT_GREEN);
         //graphics.fillRect(oxygenXStart, oxygenYStart, 31, 5);
-        //double ratioOxygen = player.getOxygen() / player.getMaxOxygen() * 10;
+        double ratioOxygen = player.getOxygen() / player.getMaxOxygen() * 10;
         //for (int i = 0; i < ratioOxygen; i++) {
         //    graphics.setColor(DARK_GREEN);
         //    graphics.fillRect(oxygenXStart + 1 + i * 3, oxygenYStart + 1, 2, 3);
         //}
+        Pixmap pixmap = new Pixmap(31, 5, Pixmap.Format.RGB888);
+        pixmap.setColor(LIGHT_GREEN);
+        pixmap.fill();
+        pixmap.setColor(com.badlogic.gdx.graphics.Color.RED);
+        for (int i = 0; i < ratioOxygen; i++) {
+                //graphics.setColor(DARK_GREEN);
+            pixmap.drawRectangle(1 + i * 3, 1, 2, 3);
+        }
+        Texture pixmaptex = new Texture(pixmap);
+        spriteBatch.draw(pixmaptex, (float)oxygenXStart, (float)oxygenYStart);
+        pixmap.dispose();
+
 //
         //// Score
-        //graphics.drawImage(SPRITE_FONT_TEXT.getText("Score:" + player.getScore() + "+" +player.getTemporaryScore(), 1), 3, 3, null);
+        text = SPRITE_FONT_TEXT.getText("Score:" + player.getScore() + "+" +player.getTemporaryScore(), 1);
+        spriteBatch.draw(text, 3, HEIGHT - 8);
+
 //        for (int i = 0; i < player.getMaxLives(); i++) {
 //             if (player.getLives() >= i) {
 //                graphics.drawImage(lifeOn, 3 + i * 10, 1, null);
@@ -75,7 +94,7 @@ public class PlayerUI extends Thing {
         background.setZIndex(-2);
         getThings().add(background);
         for (int i = 0; i < STARS; i++) {
-            Pixel star = new Pixel(new Random().nextInt(WIDTH), 11 + new Random().nextInt(HEIGHT - 11), LIGHT_GREEN);
+            Pixel star = new Pixel(RANDOM.nextInt(WIDTH), 11 + RANDOM.nextInt(HEIGHT - 11), LIGHT_GREEN);
             star.setZIndex(-2);
             getThings().add(star);
         }

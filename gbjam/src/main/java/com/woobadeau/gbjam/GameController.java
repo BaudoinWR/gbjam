@@ -1,5 +1,7 @@
 package com.woobadeau.gbjam;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.things.Thing;
@@ -47,6 +49,14 @@ public class GameController extends Thing {
             closing = true;
         } else if (closing) {
             closingTicks+=2;
+        }
+        if (isGameOver() && Gdx.input.isKeyPressed(Input.Keys.A)) {
+            reset();
+            try {
+                setup();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

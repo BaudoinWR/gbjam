@@ -42,19 +42,19 @@ public class Popup extends Thing {
 
     @Override
     public void draw(SpriteBatch spriteBatch) {
-        Texture text = SPRITE_FONT_TEXT.getText(this.text, 1);
+        Sprite text = SPRITE_FONT_TEXT.getText(this.text, 1);
         //NestableFrameBuffer nestableFrameBuffer = TinyEngine.getFrameBuffer();
         //nestableFrameBuffer.begin();
-        ScreenUtils.clear(Color.CLEAR);
+        //ScreenUtils.clear(Color.CLEAR);
         //SpriteBatch spriteBatch = TinyEngine.getSpriteBatch();
         //spriteBatch.begin();
         spriteBatch.draw(text, (int) this.getPosition().x + 1, (int) this.getPosition().y + 1);
-        text.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        Sprite sprite = new Sprite(text);
-        sprite.flip(false, true);
-        sprite.setSize((float)TinyEngine.width, (float)TinyEngine.height);
-        sprite.setPosition(0.0F, 0.0F);
-        sprite.draw(spriteBatch);
+        //text.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        //Sprite sprite = new Sprite(text);
+        //sprite.flip(false, true);
+        //sprite.setSize((float)TinyEngine.width, (float)TinyEngine.height);
+        //text.setPosition(0.0F, 0.0F);
+        //sprite.draw(spriteBatch);
         //TinyEngine.drawBufferToBatch(spriteBatch, nestableFrameBuffer);
     }
 

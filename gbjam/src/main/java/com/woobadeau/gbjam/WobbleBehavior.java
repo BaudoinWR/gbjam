@@ -6,11 +6,13 @@ import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
 import java.util.Random;
 
+import static com.woobadeau.gbjam.MainClass.RANDOM;
+
 public class WobbleBehavior implements Behavior {
     private final int offset;
 
     public WobbleBehavior() {
-        offset = new Random().nextInt(9);
+        offset = RANDOM.nextInt(9);
     }
 
     @Override

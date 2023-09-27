@@ -2,6 +2,8 @@ package com.woobadeau.gbjam;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.math.Rectangle;
 import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.behavior.ContainedBehavior;
 import com.woobadeau.tinyengine.sound.SoundFactory;
@@ -10,29 +12,12 @@ import com.woobadeau.tinyengine.things.physics.Collider;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
 import com.woobadeau.tinyengine.things.sprites.AnimatedSprite;
 import com.woobadeau.tinyengine.things.sprites.SpriteFactory;
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Timer;
-import java.util.logging.Logger;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Player extends Thing implements Collider {
-    private static final Clip ROCKET_CLIP;
-
-    static {
-        try {
-            ROCKET_CLIP = SoundFactory.getClip("/rockets.wav");
-            SoundFactory.setVolume(ROCKET_CLIP, 0.3f);
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    private static final Timer TIMER = new Timer();
-    private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
+    private static final Sound ROCKET_CLIP = SoundFactory.getSound("rockets.ogg");
     private static final int MAX_TRASH = 9;
     private static final double FUEL_OXYGEN_USAGE = 0.15;
     private static final double BREATHING_OXYGEN_USAGE = 0.05;
@@ -55,6 +40,8 @@ public class Player extends Thing implements Collider {
     private Collection<TrashSpawner.Trash> trashBag = new ArrayList<>();
     private int temporaryScore;
     private int score;
+    private boolean rocketPlaying = false;
+    private long invisibleStart = Long.MAX_VALUE;
 
     public Player() throws IOException {
         animatedSprite = SpriteFactory.createAnimatedSprite("gbspacedude.png", 2, 2);
@@ -74,6 +61,10 @@ public class Player extends Thing implements Collider {
     @Override
     public void update() {
         super.update();
+        if (!isVisible() && invisibleStart + 2000 < System.currentTimeMillis()) {
+            invisibleStart = Long.MAX_VALUE;
+            setVisible(true);
+        }
         if (TinyEngine.getTicks() % 10 == 0) {
             // if 0 then 1, if 1 then 0, if 2 then 3, if 3 then 2
             animationStep = animationStep == 1 ? 0 : animationStep == 3 ? 2 : (short) (animationStep + 1);
@@ -155,11 +146,13 @@ public class Player extends Thing implements Collider {
         if (rocketOn) {
         oxygen -= (rocketOn ? 1 : 0)
                 * FUEL_OXYGEN_USAGE;
-            if (!ROCKET_CLIP.isActive()) {
-                ROCKET_CLIP.loop(Clip.LOOP_CONTINUOUSLY);
+            if (!rocketPlaying) {
+                ROCKET_CLIP.loop(0.3f);
+                rocketPlaying = true;
             }
         } else {
             ROCKET_CLIP.stop();
+            rocketPlaying = false;
         }
         move(new Vector2D(speedX, speedY));
     }
@@ -200,12 +193,9 @@ public class Player extends Thing implements Collider {
                 temporaryScore = 0;
                 oxygen = maxOxygen;
                 speedX = speedY = 0;
-                TIMER.schedule(new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        setVisible(true);
-                    }
-                }, 2000);
+
+                invisibleStart = System.currentTimeMillis();
+
                 trashBag.clear();
                 ROCKET_CLIP.stop();
             }

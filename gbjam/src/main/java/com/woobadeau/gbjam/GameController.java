@@ -2,16 +2,20 @@ package com.woobadeau.gbjam;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
 import java.io.IOException;
-import javax.sound.sampled.Clip;
 
 import static com.woobadeau.gbjam.MainClass.HEIGHT;
 import static com.woobadeau.gbjam.MainClass.MUSIC;
+import static com.woobadeau.gbjam.MainClass.SPRITE_FONT_TEXT;
 import static com.woobadeau.gbjam.MainClass.WIDTH;
+import static com.woobadeau.gbjam.PlayerUI.DARK_GREEN;
 
 public class GameController extends Thing {
 
@@ -63,6 +67,15 @@ public class GameController extends Thing {
     @Override
     public void draw(SpriteBatch spriteBatch) {
         if (closing) {
+            Pixmap pixmap = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888);
+            pixmap.setColor(DARK_GREEN);
+            pixmap.fillRectangle(0, 0, WIDTH, (int) closingTicks);
+            pixmap.fillRectangle(0, 0, (int) closingTicks, HEIGHT);
+            pixmap.fillRectangle((int) (WIDTH - closingTicks), 0, WIDTH, HEIGHT);
+            pixmap.fillRectangle(0, (int) (HEIGHT - closingTicks), WIDTH, HEIGHT);
+            spriteBatch.draw(new Texture(pixmap), 0, 0);
+            pixmap.dispose();
+
             //BufferedImage closingScreen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
             //Graphics closerGraphics = closingScreen.getGraphics();
             //closerGraphics.setColor(DARK_GREEN);
@@ -72,9 +85,13 @@ public class GameController extends Thing {
             //closerGraphics.fillRect(0, (int) (HEIGHT - closingTicks), WIDTH, HEIGHT);
             //graphics.drawImage(closingScreen, 0, 0, null);
             if (isGameOver()) {
-                //Texture gameOver = SPRITE_FONT_TEXT.getText("GAME OVER", 1);
-                //Texture score = SPRITE_FONT_TEXT.getText("SCORE:" + player.getScore(), 1);
-                //Texture pressA = SPRITE_FONT_TEXT.getText("PRESS A TO RESTART", 1);
+                Sprite gameOver = SPRITE_FONT_TEXT.getText("GAME OVER", 1);
+                Sprite score = SPRITE_FONT_TEXT.getText("SCORE:" + player.getScore(), 1);
+                Sprite pressA = SPRITE_FONT_TEXT.getText("PRESS A TO RESTART", 1);
+                spriteBatch.draw(gameOver, (WIDTH - gameOver.getWidth()) / 2, (HEIGHT - gameOver.getHeight()) / 2 + 15);
+                spriteBatch.draw(score, (WIDTH - score.getWidth()) / 2, (HEIGHT - score.getHeight()) / 2);
+                spriteBatch.draw(pressA, (WIDTH - pressA.getWidth()) / 2, (HEIGHT - pressA.getHeight()) / 2 - 15);
+
                 //graphics.drawImage(gameOver, (WIDTH - gameOver.getWidth()) / 2, (HEIGHT - gameOver.getHeight()) / 2 - 15, null);
                 //graphics.drawImage(score, (WIDTH - score.getWidth()) / 2, (HEIGHT - score.getHeight()) / 2, null);
                 //graphics.drawImage(pressA, (WIDTH - pressA.getWidth()) / 2, (HEIGHT - pressA.getHeight()) / 2 + 15, null);
@@ -96,7 +113,8 @@ public class GameController extends Thing {
         closing = false;
         closingTicks = 0;
         asteroidSpawner = new AsteroidSpawner();
-        MUSIC.loop(Clip.LOOP_CONTINUOUSLY);
+        MUSIC.setLooping(true);
+        MUSIC.play();
     }
 
     void reset() {

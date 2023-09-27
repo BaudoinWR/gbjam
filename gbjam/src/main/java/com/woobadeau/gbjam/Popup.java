@@ -16,13 +16,8 @@
  */
 package com.woobadeau.gbjam;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.woobadeau.tinyengine.TinyEngine;
-import com.woobadeau.tinyengine.libgdx.NestableFrameBuffer;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
 

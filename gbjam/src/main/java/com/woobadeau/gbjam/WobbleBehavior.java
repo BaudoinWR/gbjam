@@ -4,7 +4,6 @@ import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.behavior.Behavior;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
-import java.util.Random;
 
 import static com.woobadeau.gbjam.MainClass.RANDOM;
 

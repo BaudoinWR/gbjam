@@ -1,8 +1,9 @@
 package com.woobadeau.gbjam;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.woobadeau.tinyengine.TinyEngine;
 import com.woobadeau.tinyengine.behavior.DestroyOutOfScreenBehavior;
 import com.woobadeau.tinyengine.sound.SoundFactory;
@@ -10,15 +11,6 @@ import com.woobadeau.tinyengine.things.Spawner;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Collider;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
-import java.awt.*;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Timer;
-import java.util.TimerTask;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import static com.woobadeau.gbjam.MainClass.BIG_SPRITE_SHEET;
 import static com.woobadeau.gbjam.MainClass.HEIGHT;
@@ -34,30 +26,21 @@ public class AsteroidSpawner extends Spawner {
     private static final long MIN_TIME_BETWEEN_ASTEROIDS = 5000;
     private static final long PERCENT_CHANCE_SPAWN = 3;
     private static final int ROTATION_SPEED = 5;
-    private static final Clip WARNING_SOUND;
+    private static final Sound WARNING_SOUND = SoundFactory.getSound("warning.ogg");
     private int exist = 0;
 
-    static {
-        try {
-            WARNING_SOUND = SoundFactory.getClip("/warning.wav");
-            SoundFactory.setVolume(WARNING_SOUND, 0.2f);
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    long lastSpawned = Instant.now().plus(Duration.ofSeconds(5)).toEpochMilli();
+    long lastSpawned = System.currentTimeMillis();
 
     @Override
     protected Thing spawn() {
-        lastSpawned = Instant.now().toEpochMilli();
+        lastSpawned = System.currentTimeMillis();
         exist++;
         return new Asteroid();
     }
 
     @Override
     protected int shouldSpawn() {
-        if (Instant.now().toEpochMilli() - lastSpawned < MIN_TIME_BETWEEN_ASTEROIDS - (TinyEngine.getTicks() * 5)) {
+        if (System.currentTimeMillis() - lastSpawned < MIN_TIME_BETWEEN_ASTEROIDS - (TinyEngine.getTicks() * 5)) {
             return 0;
         }
         return RANDOM.nextInt(100) < PERCENT_CHANCE_SPAWN / (exist + 1)  ? 1 : 0;
@@ -65,6 +48,7 @@ public class AsteroidSpawner extends Spawner {
 
 
     public class Asteroid extends Thing implements Collider {
+        private final long warningStart;
         boolean isWarning = true;
         final Quadrant quadrant;
         TextureRegion asteroidSprite;
@@ -73,21 +57,8 @@ public class AsteroidSpawner extends Spawner {
         private Asteroid() {
             this.quadrant = Quadrant.values()[RANDOM.nextInt(Quadrant.values().length)];
             speed = MIN_SPEED + RANDOM.nextDouble() * (MAX_SPEED - MIN_SPEED);
-            WARNING_SOUND.loop(2);
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    WARNING_SOUND.stop();
-                    asteroidSprite = BIG_SPRITE_SHEET.getSubImage(RANDOM.nextInt(2));
-                    isWarning = false;
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            getBehaviors().add(new DestroyOutOfScreenBehavior());
-                        }
-                    }, 1000);
-                }
-            }, WARNING_TIME);
+            WARNING_SOUND.loop(0.2f);
+            warningStart = System.currentTimeMillis();
             moveTo(new Vector2D(quadrant.xSpawn, quadrant.ySpawn));
         }
 
@@ -100,9 +71,17 @@ public class AsteroidSpawner extends Spawner {
         @Override
         public void update() {
             super.update();
-            lastSpawned = Instant.now().toEpochMilli();
+            if (isWarning && warningStart + WARNING_TIME < System.currentTimeMillis()) {
+                WARNING_SOUND.stop();
+                asteroidSprite = BIG_SPRITE_SHEET.getSubImage(RANDOM.nextInt(2));
+                isWarning = false;
+            }
+            lastSpawned = System.currentTimeMillis();
             if (!isWarning) {
                 move(new Vector2D(quadrant.xSpeed * speed, quadrant.ySpeed * speed));
+            }
+            if (warningStart + WARNING_TIME + 1000 < System.currentTimeMillis()) {
+                getBehaviors().add(new DestroyOutOfScreenBehavior());
             }
         }
 

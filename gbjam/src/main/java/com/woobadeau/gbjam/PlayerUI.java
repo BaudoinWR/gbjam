@@ -9,21 +9,18 @@ import com.woobadeau.tinyengine.things.library.Pixel;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
 import com.woobadeau.tinyengine.things.sprites.Sprite;
 import com.woobadeau.tinyengine.things.sprites.SpriteFactory;
-import java.awt.*;
 import java.io.IOException;
-import java.util.Random;
 
 import static com.woobadeau.gbjam.MainClass.HEIGHT;
 import static com.woobadeau.gbjam.MainClass.RANDOM;
 import static com.woobadeau.gbjam.MainClass.SPRITE_FONT_TEXT;
-import static com.woobadeau.gbjam.MainClass.SPRITE_SHEET;
 import static com.woobadeau.gbjam.MainClass.WIDTH;
 
 public class PlayerUI extends Thing {
     //static final Color LIGHT_GREEN = new Color(224, 248, 208);
     static final int LIGHT_GREEN = 0xE0F8D0FF;
-    static final Color MID_GREEN = new Color(52, 104, 86);
-    static final Color DARK_GREEN = new Color(8, 24, 32);
+    static final int MID_GREEN = 0x88C070FF;
+    static final int DARK_GREEN = 0x081820FF;
     private final Player player;
     private final Integer STARS = 100;
     //private static final Texture lifeOn = SPRITE_SHEET.getImage(3);
@@ -57,7 +54,7 @@ public class PlayerUI extends Thing {
         Pixmap pixmap = new Pixmap(31, 5, Pixmap.Format.RGB888);
         pixmap.setColor(LIGHT_GREEN);
         pixmap.fill();
-        pixmap.setColor(com.badlogic.gdx.graphics.Color.RED);
+        pixmap.setColor(MID_GREEN);
         for (int i = 0; i < ratioOxygen; i++) {
                 //graphics.setColor(DARK_GREEN);
             pixmap.drawRectangle(1 + i * 3, 1, 2, 3);

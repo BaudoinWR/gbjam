@@ -1,14 +1,13 @@
 package com.woobadeau.gbjam;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.woobadeau.tinyengine.behavior.ContainedBehavior;
 import com.woobadeau.tinyengine.things.Thing;
 import com.woobadeau.tinyengine.things.physics.Collider;
 import com.woobadeau.tinyengine.things.physics.Vector2D;
 import com.woobadeau.tinyengine.things.sprites.SpriteFactory;
-import java.awt.*;
 import java.io.IOException;
 
-import static com.woobadeau.gbjam.MainClass.HEIGHT;
 
 public class Ship extends Thing implements Collider {
     protected Ship() throws IOException {
